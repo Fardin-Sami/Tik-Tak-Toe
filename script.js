@@ -123,7 +123,7 @@ function aiMove() {
 function checkGameOver() {
     // 1. Capitalize the first letter so 'easy' becomes 'Easy'
     const mode = currentMode.charAt(0).toUpperCase() + currentMode.slice(1);
-    const modeName = mode === "Easy" ? "Drax" : "Strange";
+    const modeName = mode === "Easy" ? "Thor" : "Strange";
 
     // 2. Add the modeName into the winning/tying messages
     if (checkWin(board, HUMAN)) {
