@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tik Tak Toe</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <main>
+        <h1>Tik Tak Toe</h1>
+        
+        <div id="mode-screen" class="screen">
+            <h2>Choose your opponent :</h2>
+            <button class="menu-btn" data-mode="easy" id="drax">Drax the destroyer</button>
+            <button class="menu-btn" data-mode="hard" id="strange">Dr. Strange</button>
+        </div>
+
+        <div id="game-screen" class="screen hidden">
+            <div class="container">
+                <div class="game">
+                    <button class="box"></button>
+                    <button class="box"></button>
+                    <button class="box"></button>
+                    <button class="box"></button>
+                    <button class="box"></button>
+                    <button class="box"></button>
+                    <button class="box"></button>
+                    <button class="box"></button>
+                    <button class="box"></button>
+                </div>
+            </div>
+            <div class="controls">
+                <button class="resetGame">Restart</button>
+                <button id="back-to-menu">Main Menu</button>
+            </div>
+        </div>
+
+        <div id="result-screen" class="screen hidden">
+            <h2 id="result-message"></h2>
+            <button id="play-again" class="menu-btn">Play Again</button>
+        </div>
+    </main>
+
+    <script src="./gameLogic.js"></script>
+    <script src="./script.js"></script>
+</body>
+</html>
