@@ -67,16 +67,29 @@ h2 {
     background-color: #F5EE9E;
     height: 18vmin;
     width: 18vmin;
+    padding: 0;
     border: 1px solid transparent;
     border-radius: 1rem;
     box-shadow: 0 0 1rem rgba(0,0,0,0.3);
-    font-size: 12 vmin;
+    
+    /* The Fix: clamp(minimum size, preferred dynamic size, maximum size) */
+    font-size: clamp(4rem, 15vmin, 9rem); 
+    
     text-align: center;
     color: #AB3428;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
+    overflow: hidden;
+}
+
+.box span {
+    /* "inherit" tells the span to perfectly match the clamp size from the box */
+    font-size: inherit; 
+    line-height: 1;
+    display: inline-block;
+    animation: drawIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
 
 /* Writing Animation for X and O */
