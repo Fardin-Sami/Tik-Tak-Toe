@@ -121,14 +121,19 @@ function aiMove() {
 }
 
 function checkGameOver() {
+    // 1. Capitalize the first letter so 'easy' becomes 'Easy'
+    const mode = currentMode.charAt(0).toUpperCase() + currentMode.slice(1);
+    const modeName = mode === "Easy" ? "Drax" : "Strange";
+
+    // 2. Add the modeName into the winning/tying messages
     if (checkWin(board, HUMAN)) {
-        endGame("You Win!");
+        endGame(`You Win! (${modeName} Mode)`);
         return true;
     } else if (checkWin(board, AI)) {
-        endGame("AI Wins!");
+        endGame(`${modeName} Wins!`);
         return true;
     } else if (getEmptySpots(board).length === 0) {
-        endGame("It's a Tie!");
+        endGame(`It's a Tie! (${modeName} Mode)`);
         return true;
     }
     return false;
