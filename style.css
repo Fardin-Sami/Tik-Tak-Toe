@@ -70,7 +70,7 @@ h2 {
     border: 1px solid transparent;
     border-radius: 1rem;
     box-shadow: 0 0 1rem rgba(0,0,0,0.3);
-    font-size: 9rem;
+    font-size: 12 vmin;
     text-align: center;
     color: #AB3428;
     cursor: pointer;
