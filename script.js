@@ -1,26 +1,43 @@
 let board = Array(9).fill(null);
 let gameActive = false;
 let currentMode = 'hard'; 
+let gameType = 'pvc'; // 'pvc' (Player vs Computer) or 'pvp' (Player vs Player)
+let currentPlayer = HUMAN; // Tracks whose turn it is in PvP mode
 let lastHumanMoveIndex = -1;
 
 // Screen & UI Elements
+const startScreen = document.getElementById('start-screen');
 const modeScreen = document.getElementById('mode-screen');
 const gameScreen = document.getElementById('game-screen');
 const resultScreen = document.getElementById('result-screen');
 const boxes = document.querySelectorAll('.box');
 const resultMessage = document.getElementById('result-message');
+const turnIndicator = document.getElementById('turn-indicator');
 
 // Buttons
-const modeBtns = document.querySelectorAll('.menu-btn');
+const btnPvc = document.getElementById('btn-pvc');
+const btnPvp = document.getElementById('btn-pvp');
+const modeBtns = document.querySelectorAll('.menu-btn[data-mode]');
 const resetGameBtn = document.querySelector('.resetGame');
 const backToMenuBtn = document.getElementById('back-to-menu');
 const playAgainBtn = document.getElementById('play-again');
-const drax = document.getElementById("drax");
-const strange = document.getElementById("strange");
 
 // --- EVENT LISTENERS ---
 
-// 1. Mode Selection Menu
+// 1. Initial Menu Selection
+btnPvc.addEventListener('click', () => {
+    gameType = 'pvc';
+    startScreen.classList.add('hidden');
+    modeScreen.classList.remove('hidden');
+});
+
+btnPvp.addEventListener('click', () => {
+    gameType = 'pvp';
+    startScreen.classList.add('hidden');
+    startGame();
+});
+
+// 2. AI Difficulty Selection
 modeBtns.forEach(btn => {
     btn.addEventListener('click', (e) => {
         if (e.target.dataset.mode) {
@@ -30,52 +47,37 @@ modeBtns.forEach(btn => {
     });
 });
 
-strange.addEventListener("mouseover", () => {
-    strange.style.backgroundColor = "red";
-    strange.style.color = "black";
-});
-
-strange.addEventListener("mouseout", () => {
-    strange.style.backgroundColor = "black";
-    strange.style.color = "white";
-});
-
-drax.addEventListener("mouseover", () => {
-    drax.style.backgroundColor = "green";
-    drax.style.color = "black";
-});
-
-drax.addEventListener("mouseout", () => {
-    drax.style.backgroundColor = "black";
-    drax.style.color = "white";
-});
-
-// 2. Gameplay Clicks
+// 3. Gameplay Clicks
 boxes.forEach((box, index) => {
     box.addEventListener('click', () => {
-        // Allow move only if spot is empty AND it is human's turn (gameActive is true)
         if (board[index] === null && gameActive) {
-            lastHumanMoveIndex = index; // Save this for the Easy AI to track
-            makeMove(index, HUMAN);
             
-            if (!checkGameOver()) {
-                // Lock the board temporarily so human can't click while AI is "thinking"
-                gameActive = false; 
-                // Add a 600ms delay for the AI move
-                setTimeout(aiMove, 600); 
+            if (gameType === 'pvp') {
+                // PvP Mode: Two Humans
+                makeMove(index, currentPlayer);
+                if (!checkGameOver()) {
+                    // Switch turn to the other player
+                    currentPlayer = currentPlayer === HUMAN ? AI : HUMAN;
+                    updateTurnIndicator();
+                }
+            } else {
+                // PvC Mode: Human vs Computer
+                lastHumanMoveIndex = index; 
+                makeMove(index, HUMAN);
+                
+                if (!checkGameOver()) {
+                    gameActive = false; // Lock board while AI thinks
+                    setTimeout(aiMove, 600); 
+                }
             }
         }
     });
 });
 
-// 3. Navigation Buttons
+// 4. Navigation Buttons
 resetGameBtn.addEventListener('click', startGame);
 playAgainBtn.addEventListener('click', startGame);
-backToMenuBtn.addEventListener('click', () => {
-    gameScreen.classList.add('hidden');
-    resultScreen.classList.add('hidden');
-    modeScreen.classList.remove('hidden');
-});
+backToMenuBtn.addEventListener('click', () => location.reload());
 
 // --- GAME FUNCTIONS ---
 
@@ -83,22 +85,39 @@ function startGame() {
     board = Array(9).fill(null);
     gameActive = true;
     lastHumanMoveIndex = -1;
+    currentPlayer = HUMAN; // Always start with X
     
-    // Clear the visual board
+    // Clear the visual board and remove color classes
     boxes.forEach(box => {
         box.innerHTML = "";
+        box.classList.remove('x-mark', 'o-mark');
     });
 
     // Handle Screen Visibility
+    startScreen.classList.add('hidden');
     modeScreen.classList.add('hidden');
     resultScreen.classList.add('hidden');
     gameScreen.classList.remove('hidden');
+
+    updateTurnIndicator();
+}
+
+function updateTurnIndicator() {
+    if (gameType === 'pvp') {
+        turnIndicator.innerText = `Player ${currentPlayer}'s Turn`;
+        turnIndicator.classList.remove('hidden');
+        // Change color based on whose turn it is
+        turnIndicator.style.color = currentPlayer === HUMAN ? '#00d2ff' : '#ff0080';
+    } else {
+        turnIndicator.classList.add('hidden');
+    }
 }
 
 function makeMove(index, player) {
     board[index] = player;
-    // We wrap the text in a <span> so the CSS @keyframes animation triggers
     boxes[index].innerHTML = `<span>${player}</span>`; 
+    // Add CSS class for neon colors
+    boxes[index].classList.add(player === HUMAN ? 'x-mark' : 'o-mark');
 }
 
 function aiMove() {
@@ -112,8 +131,6 @@ function aiMove() {
 
     if (moveIndex !== -1) {
         makeMove(moveIndex, AI);
-        
-        // Unlock the board for the human's next turn if the game isn't over
         if (!checkGameOver()) {
             gameActive = true; 
         }
@@ -121,19 +138,19 @@ function aiMove() {
 }
 
 function checkGameOver() {
-    // 1. Capitalize the first letter so 'easy' becomes 'Easy'
-    const mode = currentMode.charAt(0).toUpperCase() + currentMode.slice(1);
-    const modeName = mode === "Easy" ? "Thor" : "Strange";
+    const modeName = currentMode === "easy" ? "Thor" : "Strange";
 
-    // 2. Add the modeName into the winning/tying messages
     if (checkWin(board, HUMAN)) {
-        endGame(`You Win! (${modeName} Mode)`);
+        if (gameType === 'pvp') endGame("Player X Wins!");
+        else endGame(`You Win! (${modeName} Mode)`);
         return true;
     } else if (checkWin(board, AI)) {
-        endGame(`${modeName} Wins!`);
+        if (gameType === 'pvp') endGame("Player O Wins!");
+        else endGame(`${modeName} Wins!`);
         return true;
     } else if (getEmptySpots(board).length === 0) {
-        endGame(`It's a Tie! (${modeName} Mode)`);
+        if (gameType === 'pvp') endGame("It's a Tie!");
+        else endGame(`It's a Tie! (${modeName} Mode)`);
         return true;
     }
     return false;
@@ -141,8 +158,6 @@ function checkGameOver() {
 
 function endGame(message) {
     gameActive = false;
-    
-    // Wait 800ms before showing the result screen so the final animation finishes
     setTimeout(() => {
         gameScreen.classList.add('hidden');
         resultMessage.innerText = message;

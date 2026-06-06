@@ -10,13 +10,25 @@
     <main>
         <h1>Tik Tak Toe</h1>
         
-        <div id="mode-screen" class="screen">
-            <h2>Choose your opponent :</h2>
-            <button class="menu-btn" data-mode="easy" id="drax">Thor</button>
-            <button class="menu-btn" data-mode="hard" id="strange">Dr. Strange</button>
+        <div id="start-screen" class="screen">
+            <h2>Select Game Mode</h2>
+            <div class="menu-options">
+                <button class="menu-btn" id="btn-pvc">Play vs Computer</button>
+                <button class="menu-btn" id="btn-pvp">Play vs Human (Local)</button>
+            </div>
+        </div>
+
+        <div id="mode-screen" class="screen hidden">
+            <h2>Choose your opponent:</h2>
+            <div class="menu-options">
+                <button class="menu-btn" data-mode="easy" id="drax">Thor</button>
+                <button class="menu-btn" data-mode="hard" id="strange">Dr. Strange</button>
+            </div>
+            <button class="back-btn" onclick="location.reload()">Back</button>
         </div>
 
         <div id="game-screen" class="screen hidden">
+            <h3 id="turn-indicator" class="hidden">Player X's Turn</h3>
             <div class="container">
                 <div class="game">
                     <button class="box"></button>
@@ -39,6 +51,7 @@
         <div id="result-screen" class="screen hidden">
             <h2 id="result-message"></h2>
             <button id="play-again" class="menu-btn">Play Again</button>
+            <button class="back-btn mt-1" onclick="location.reload()">Main Menu</button>
         </div>
     </main>
 
